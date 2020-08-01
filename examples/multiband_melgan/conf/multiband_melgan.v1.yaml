@@ -66,7 +66,7 @@ lambda_adv: 2.5              # Loss balancing coefficient for adversarial loss.
 #                  DATA LOADER SETTING                    #
 ###########################################################
 batch_size: 64                 # Batch size.
-batch_max_steps: 8192          # Length of each audio in batch for training. Make sure dividable by hop_size.
+batch_max_steps: 16384         # Length of each audio in batch for training. Make sure dividable by hop_size.
 batch_max_steps_valid: 81920   # Length of each audio for validation. Make sure dividable by hope_size.
 remove_short_samples: true     # Whether to remove samples the length of which are less than batch_max_steps.
 allow_cache: true              # Whether to allow cache in dataset. If true, it requires cpu memory.
@@ -79,7 +79,7 @@ generator_optimizer_params:
     lr_fn: "PiecewiseConstantDecay"
     lr_params: 
         boundaries: [100000, 200000, 300000, 400000, 500000, 600000, 700000]
-        values: [0.001, 0.0005, 0.00025, 0.000125, 0.0000625, 0.00003125, 0.000015625, 0.000001]
+        values: [0.0005, 0.0005, 0.00025, 0.000125, 0.0000625, 0.00003125, 0.000015625, 0.000001]
     amsgrad: false
 
 discriminator_optimizer_params:

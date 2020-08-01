@@ -139,7 +139,7 @@ def main():
     config.update(vars(args))
 
     processor = LJSpeechProcessor(
-        root_path=args.rootdir, cleaner_names="english_cleaners"
+        root_path=args.rootdir, cleaner_names="korean_cleaners"
     )
 
     # check directly existence

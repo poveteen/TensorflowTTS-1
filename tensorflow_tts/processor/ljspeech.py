@@ -10,113 +10,21 @@ import soundfile as sf
 
 from tensorflow_tts.utils import cleaners
 
-valid_symbols = [
-    "AA",
-    "AA0",
-    "AA1",
-    "AA2",
-    "AE",
-    "AE0",
-    "AE1",
-    "AE2",
-    "AH",
-    "AH0",
-    "AH1",
-    "AH2",
-    "AO",
-    "AO0",
-    "AO1",
-    "AO2",
-    "AW",
-    "AW0",
-    "AW1",
-    "AW2",
-    "AY",
-    "AY0",
-    "AY1",
-    "AY2",
-    "B",
-    "CH",
-    "D",
-    "DH",
-    "EH",
-    "EH0",
-    "EH1",
-    "EH2",
-    "ER",
-    "ER0",
-    "ER1",
-    "ER2",
-    "EY",
-    "EY0",
-    "EY1",
-    "EY2",
-    "F",
-    "G",
-    "HH",
-    "IH",
-    "IH0",
-    "IH1",
-    "IH2",
-    "IY",
-    "IY0",
-    "IY1",
-    "IY2",
-    "JH",
-    "K",
-    "L",
-    "M",
-    "N",
-    "NG",
-    "OW",
-    "OW0",
-    "OW1",
-    "OW2",
-    "OY",
-    "OY0",
-    "OY1",
-    "OY2",
-    "P",
-    "R",
-    "S",
-    "SH",
-    "T",
-    "TH",
-    "UH",
-    "UH0",
-    "UH1",
-    "UH2",
-    "UW",
-    "UW0",
-    "UW1",
-    "UW2",
-    "V",
-    "W",
-    "Y",
-    "Z",
-    "ZH",
-]
+_korean_jaso_code = list(range(0x1100, 0x1113)) + list(range(0x1161, 0x1176)) + list(range(0x11a8, 0x11c3))
+_korean_jaso = list(chr(c) for c in _korean_jaso_code)
 
 _pad = "_"
 _eos = "~"
-_punctuation = "!'(),.:;? "
-_special = "-"
-_letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-
-# Prepend "@" to ARPAbet symbols to ensure uniqueness (some are the same as uppercase letters):
-_arpabet = ["@" + s for s in valid_symbols]
+_punctuation = " .!?"
 
 # Export all symbols:
 symbols = (
-    [_pad] + list(_special) + list(_punctuation) + list(_letters) + _arpabet + [_eos]
+    [_pad] + list(_punctuation) + list(_korean_jaso) + [_eos]
 )
 
 # Mappings from symbol to numeric ID and vice versa:
 _symbol_to_id = {s: i for i, s in enumerate(symbols)}
 _id_to_symbol = {i: s for i, s in enumerate(symbols)}
-
-# Regular expression matching text enclosed in curly braces:
-_curly_re = re.compile(r"(.*?)\{(.+?)\}(.*)")
 
 
 class LJSpeechProcessor(object):
@@ -133,7 +41,7 @@ class LJSpeechProcessor(object):
                 for line in ttf:
                     parts = line.strip().split("|")
                     wav_path = os.path.join(root_path, "wavs", "%s.wav" % parts[0])
-                    text = parts[2]
+                    text = parts[1]
                     items.append([text, wav_path, self.speaker_name])
 
             self.items = items
@@ -164,18 +72,10 @@ class LJSpeechProcessor(object):
 
         sequence = []
         # Check for curly braces and treat their contents as ARPAbet:
-        while len(text):
-            m = _curly_re.match(text)
-            if not m:
-                sequence += _symbols_to_sequence(
-                    _clean_text(text, [self.cleaner_names])
-                )
-                break
+        if len(text):
             sequence += _symbols_to_sequence(
-                _clean_text(m.group(1), self.cleaner_names)
+                _clean_text(text, [self.cleaner_names])
             )
-            sequence += _arpabet_to_sequence(m.group(2))
-            text = m.group(3)
         return sequence
 
 
@@ -190,10 +90,6 @@ def _clean_text(text, cleaner_names):
 
 def _symbols_to_sequence(symbols):
     return [_symbol_to_id[s] for s in symbols if _should_keep_symbol(s)]
-
-
-def _arpabet_to_sequence(text):
-    return _symbols_to_sequence(["@" + s for s in text.split()])
 
 
 def _should_keep_symbol(s):

@@ -24,6 +24,7 @@
 # Regular expression matching whitespace:
 import re
 from unidecode import unidecode
+from unicodedata import normalize
 from tensorflow_tts.utils.number_norm import normalize_numbers
 
 
@@ -77,6 +78,10 @@ def convert_to_ascii(text):
     return unidecode(text)
 
 
+def nfd(text):
+  return normalize('NFD', text)
+
+
 def basic_cleaners(text):
     """Basic pipeline that lowercases and collapses whitespace without transliteration."""
     text = lowercase(text)
@@ -100,3 +105,11 @@ def english_cleaners(text):
     text = expand_abbreviations(text)
     text = collapse_whitespace(text)
     return text
+
+
+def korean_cleaners(text):
+    """Pipeline for Korean text,"""
+    text = collapse_whitespace(text)
+    text = nfd(text)
+    return text
+
