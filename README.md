@@ -1,3 +1,7 @@
+이 저장소는 SCE-TTS 프로젝트에서 사용하기 위해 [TensorSpeech/TensorflowTTS](https://github.com/TensorSpeech/TensorflowTTS)를 포크하여 수정한 저장소입니다.
+
+---
+
 <h2 align="center">
 <p> :yum: TensorflowTTS
 <p align="center">
